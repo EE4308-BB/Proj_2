@@ -42,13 +42,6 @@ More information can be found in https://eigen.tuxfamily.org/dox-3.2/group__Quic
 | `X(i,j)` | Returns the `i`-th row and `j`-column value of the matrix `X`. `i` and `j` starts from zero. |
 | `X(i)` | Returns the `i`-th value of `X`, asssuming `X` is a `Eigen::Vector??` type. |
 
-
-((J.transpose() * J).inverse() * J.transpose()).row(0);
-
-        Eigen::MatrixXd J;
-        J.resize(2 * sg_half_window_ + 1, sg_order_ + 1);
-
-
 # 3&emsp;Troubleshooting
 1. Use VSCode's Intellisense to aid the programming process, such as displaying the function and property hints.
 2. To create a new function, both the header file and source file must be modified.
