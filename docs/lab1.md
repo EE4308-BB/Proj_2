@@ -59,6 +59,7 @@ The submitted zip is named as `l1_<matric>.zip` where `<matric>` is your student
 
 3. Let the `ee4308` folder be known as the **workspace** folder. Navigate into the workspace folder, and build the files.
    ```bash
+   cd ~/ee4308
    colcon build --symlink-install
    ```
     Wait for about a minute.
