@@ -163,7 +163,7 @@ In this section, the map created from SLAM is used for navigation by the ROS2 Na
 # 5&emsp;Pure Pursuit 
 In this lab, implement a simple pure pursuit controller as part of a Nav2 controller plugin.
 
-Pure pursuit finds the **lookahead point** along a path that is at least a lookahead-distance away from the closest point.
+Pure pursuit finds the **lookahead point** along a path that is at least a lookahead-distance away from the **robot**.
 
 ![lookahead](img/lookahead.png)
 
