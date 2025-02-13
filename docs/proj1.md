@@ -68,15 +68,14 @@ For all filenames, label as `p1_team##` (**lowercase**), where `##` is the doubl
 | --- | --- |
 | P1C | Zip the `ee4308/src` folder into `p1_team##.zip`. A well-programmed code is highly readable. Highly readable code consist of judicious comments, proper indentation, appropriately named variables, and minimal code. There is deliberate thought in considering the effects of every piece of code, such that possible bugs are prevented, and a balance between readability and optimization is achieved. |
 | P1R | A report `p1_team##.pdf`. **Do not include your names in the report, only the matric numbers**. About 10 to 15 pages excluding front-matter and back-matter. In a good report, the existing algorithms are examined in detail and simple solutions are proposed to significantly improve the algorithms. Deliberate comparisons are made to compare solutions, and advice is given based on realistic situations. Experiments and methodologies to tune parameters are well designed and justified. The narrative is concise and clear. Any figures, tables and references are labelled. There is a title page and content page, and the report is tidy and well organized.  |
-| P1P | A recorded presentation and demonstration `p1_team##.mp4`. 6-min of presentation with slides, and 1-min of a sped-up physical robot demonstration. 8-min of Q&A will be conducted at the end of the video playback during the presentation slot. In a good presentation, the narrative is based primarily on the solutions and analyses. A detailed understanding of the concepts and related nuances are demonstrated with concise explanations. Summaries and diagrams are used for comparisons and advice. |
+| P1P | A recorded presentation and demonstration `p1_team##.mp4`. 6-min of presentation with slides, and max 3-min of a physical robot demonstration with screen recording (normal speed, see https://youtu.be/m7npzdYp6Ok ). About 7-min of Q&A will be conducted after the combined video is played back during the presentation slot. In a good presentation, the narrative is based primarily on the solutions and analyses. A detailed understanding of the concepts and related nuances are demonstrated with concise explanations. Summaries and diagrams are used for comparisons and advice.|
 
 ## 1.2&emsp;Robot Loaning and Testing
 After programming and testing in simulation, the code has to be tested on a physical robot. Every team will be able to loan a robotic kit to test on a playing field in the lab. Three waypoints will be provided that the robot has to move to, and the physical run has to be filmed for the demonstration video.
 
 Once the program is working in simulation,
-1. Email the TA / GA for loaning the robotic kit on behalf of your team.
-2. Select slots on Canvas People (P1 Lab) to book a lab session. First come first served. 
-3. The robotic kit can be brought home. Return the robotic kit before the presentation.
+1. Fill up the **Robot Kit Loan Form** on Canvas, and submit back to Canvas. The loan form must contain signatures (not initials), and the team will be liable for any loss of equipment. After submitting, email the TA / GA for loaning. The robot kit can be brought home, and must be returned at most one week after the presentation slot.
+2. Select lab slots on Canvas People (P1 Lab) to book a lab session. First come first served.
 
 # 2&emsp;Regulated Pure Pursuit
 
