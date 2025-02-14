@@ -128,6 +128,8 @@ A subscriber to the laser scan topic is required to implement the obstacle heuri
 
 
 # 3&emsp;A* Path Planning and Savitsky-Golay Smoothing
+A* Visualization at https://planners-js.vercel.app/ (Docs for the visualization at https://planners-js-docs.vercel.app/UserGuide.html#quick-start ). 
+
 Implement A* in the Nav2 planner plugin to find a path around obstacles, and implement the Savitsky-Golay smoother. You may choose to improve A* by introducing post-processing or converting to multi-cost Theta*. The pseudocode for A* is provided in a later section.
 
 Savitsky-Golay smoothing is done by fitting a polynomial curve over a moving window of regularly-spaced points of a path.
