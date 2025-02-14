@@ -85,7 +85,7 @@ Regulated pure pursuit is implemented on top of pure pursuit with the following 
 
 ![rpp_heu](img/rpp_heu.png)
 
-$c_h$, $d_{prox}$ and $g_l$ are the curvature threshold, proximity threshold, and lookahead gain respectively, and are user-defined constants. $v'$ is the linear velocity from the previous time-step, $d_o$ is the distance to the closest obstacle, and $L_h$ is the adjusted lookahead distance.
+$c_h$, $d_{prox}$ and $g_l$ are the curvature threshold, proximity threshold, and lookahead gain respectively, and are user-defined constants. $v'$ is the desired linear velocity, $d_o$ is the distance to the closest obstacle, and $L_h$ is the adjusted lookahead distance.
 
 ## 2.1&emsp;Relevant Files for Controller
 Same as lab 1. `controller.cpp`, `controller.hpp`, and `proj1.yaml`.
