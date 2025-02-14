@@ -191,7 +191,7 @@ The *minimal* pseudocode is:
 12. &emsp;&emsp;**End If**
 13. &emsp;&emsp;Mark $n$ as expanded.
 14. &emsp;&emsp;**For** each accessible neighbor node $m$ of $n$ **Do**
-15. &emsp;&emsp;&emsp; $\tilde{g}$ &larr; $g$-cost of $n$ $+$ (physical distance between $n$ and $m$) $\times$ (map cost at $m$)
+15. &emsp;&emsp;&emsp; $\tilde{g}$ &larr; $g$-cost of $n$ $+$ (physical distance between $n$ and $m$) $\times$ (map cost at $m$ + 1)
 16. &emsp;&emsp;&emsp;**If** $\tilde{g} <$ $g$-cost of $m$ **Then**
 17. &emsp;&emsp;&emsp;&emsp; $g$-cost of $m$ &larr; $\tilde{g}$
 18. &emsp;&emsp;&emsp;&emsp;parent of $m$ &larr; $n$
