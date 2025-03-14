@@ -7,11 +7,13 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ee4308_gazebo_plugins REQUIRED)
 
 install(
   DIRECTORY launch rviz params maps urdf worlds
   DESTINATION share/${PROJECT_NAME}/
 )
+
 
 set(ignoreMe "${CMAKE_EXPORT_COMPILE_COMMANDS}")
 

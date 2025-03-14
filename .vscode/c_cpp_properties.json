@@ -1,0 +1,24 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "compileCommands": "${workspaceFolder}/build/compile_commands.json",
+      "includePath": [
+        "/opt/ros/humble/include/**",
+        "${workspaceRoot}/src/ee4308_drone/include/**",
+        "${workspaceRoot}/src/ee4308_core/include/**",
+        "/usr/include/**",
+        "/usr/include/eigen3/**"
+      ],
+      "name": "ROS-EE4308",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu17",
+      "cppStandard": "gnu++17"
+    }
+  ],
+  "version": 4
+}

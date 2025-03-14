@@ -1,10 +1,10 @@
-EE4308 Lab1 and Project 1
+EE4308 Lab 2 and Project 2
 ===
 
-[Lab 1 Manual](docs/lab1.md)
+[Lab 2 Manual](docs/lab2.md)
 
-[Lab 1 Answer Sheet](docs/lab1_answers.md)
+[Lab 2 Answer Sheet](docs/lab2_answers.md)
 
-[Project 1 Manual](docs/proj1.md)
+[Project 2 Manual](docs/proj2.md)
 
 [Tips](docs/tips.md)
