@@ -282,7 +282,7 @@ The following variables / functions should be used:
 | `Xx_` | `Eigen::Vector2d` | No | $\mathbf{\hat{X}}_x$. To store the drone's predicted $x$ position and velocity in the world frame. |
 | `Xy_` | `Eigen::Vector2d` | No | $\mathbf{\hat{X}}_y$. To store the drone's predicted $y$ position and velocity in the world frame. |
 | `Xz_` | `Eigen::Vector2d` | No | $\mathbf{\hat{X}}_z$. To store the drone's predicted $z$ position and velocity in the world frame. |
-| `Xa_` | `Eigen::Vector2d` | No | $\mathbf{\hat{X}}_z$. To store the drone's predicted yaw and yaw velocity in the world frame. |
+| `Xa_` | `Eigen::Vector2d` | No | $\mathbf{\hat{X}}_a$. To store the drone's predicted yaw and yaw velocity in the world frame. |
 | `Px_` | `Eigen::Matrix2d` | No | $\mathbf{P}_x$. To store the predicted covariance matrix for the states in $\mathbf{\hat{X}}_x$. |
 | `Py_` | `Eigen::Matrix2d` | No | $\mathbf{P}_y$. To store the predicted covariance matrix for the states in $\mathbf{\hat{X}}_y$. |
 | `Pz_` | `Eigen::Matrix2d` | No | $\mathbf{P}_z$. To store the predicted covariance matrix for the states in $\mathbf{\hat{X}}_z$. |
