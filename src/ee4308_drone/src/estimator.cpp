@@ -169,8 +169,6 @@ namespace ee4308::drone
         double y = (N + alt) * cos_lat * sin_lon;
         double z = ((1 - e_sq) * N + alt) * sin_lat;
 
-
-        Eigen::Vector3d ECEF;
         ECEF << x, y, z;
 
         return ECEF;
