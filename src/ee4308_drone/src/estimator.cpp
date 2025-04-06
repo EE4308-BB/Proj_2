@@ -41,7 +41,7 @@ namespace ee4308::drone
                 0, 1;
 
         Eigen::Matrix2d W_xk;
-        W_xk << -0.5 * dt * dt * , 0
+        W_xk << -0.5 * dt * dt, 0,
                 dt, 0;
 
         Eigen::Matrix2d Q_x;
