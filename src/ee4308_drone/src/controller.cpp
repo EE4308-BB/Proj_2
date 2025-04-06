@@ -86,13 +86,19 @@ namespace ee4308::drone
         double dx = lookahead_point.pose.position.x - px;
         double dy = lookahead_point.pose.position.y - py;
         double dz = lookahead_point.pose.position.z - pz;
+
+        double phi_r = ee4308::getYawFromQuaternion(current_pose.orientation);
+
+        double x_dash = dx * std::cos(phi_r) + dy * std::sin(phi_r);
+        double y_dash = dy * std::cos(phi_r) - dx * std::sin(phi_r);
+
         
         // Calculate the 2D distance
         double distance_xy = std::hypot(dx, dy);
 
         // Calculate the desired velocities in x, y, and z directions
-        double x_vel = kp_xy_ * dx / distance_xy;
-        double y_vel = kp_xy_ * dy / distance_xy;
+        double x_vel = kp_xy_ * x_dash / distance_xy;
+        double y_vel = kp_xy_ * y_dash / distance_xy;
         double z_vel = kp_z_ * dz;
 
         // Constrain the velocities to the maximum limits
