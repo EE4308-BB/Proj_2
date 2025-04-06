@@ -48,7 +48,7 @@ namespace ee4308::drone
         Q_x << var_imu_x_, 0,
                 0       , var_imu_y_;
 
-        Xx_ = F_xk * Xx_ + W_xk * U_linear_xy;
+        Xx_ = F_xk * Xx_ + W_xk * A_linear_xy(0);
         Px_ = F_xk * Px_ * F_xk.transpose() + W_xk * Q_x * W_xk.transpose();
         //----------------------------------------------------------------
 
@@ -64,7 +64,7 @@ namespace ee4308::drone
         Q_y << var_imu_x_, 0,
                 0       , var_imu_y_;
         
-        Xy_ = F_yk * Xy_ + W_yk * U_linear_xy;
+        Xy_ = F_yk * Xy_ + W_yk * A_linear_xy(1);
         Py_ = F_yk * Py_ * F_yk.transpose() + W_yk * Q_y * W_yk.transpose();
         //----------------------------------------------------------------
         
