@@ -19,9 +19,6 @@ namespace ee4308::drone
         //      Required for terminal printing during demonstration.
 
         double theta = Xa_(0);
-        Eigen::Matrix2d transformation;
-        transformation << std::cos(theta), -std::sin(theta),
-                            std::sin(theta),  std::cos(theta);
 
 
         double u_xk = msg.linear_acceleration.x;
@@ -33,22 +30,19 @@ namespace ee4308::drone
         Eigen::Vector2d U_linear_xy;
         U_linear_xy << u_xk, u_yk;
 
-        Eigen::Vector2d A_linear_xy;
-        A_linear_xy = transformation * U_linear_xy;
-
         Eigen::Matrix2d F_xk;
         F_xk << 1, dt,
                 0, 1;
 
         Eigen::Matrix2d W_xk;
-        W_xk << -0.5 * dt * dt, 0,
-                dt, 0;
+        W_xk << 0.5 * dt * dt * std::cos(theta), -0.5 * dt * dt * std::sin(theta),
+                dt * std::cos(theta), -dt * std::sin(theta);
 
         Eigen::Matrix2d Q_x;
         Q_x << var_imu_x_, 0,
                 0       , var_imu_y_;
 
-        Xx_ = F_xk * Xx_ + W_xk.col(0) * A_linear_xy(0);
+        Xx_ = F_xk * Xx_ + W_xk * U_linear_xy;
         Px_ = F_xk * Px_ * F_xk.transpose() + W_xk * Q_x * W_xk.transpose();
         //----------------------------------------------------------------
 
@@ -57,14 +51,14 @@ namespace ee4308::drone
                 0, 1;
 
         Eigen::Matrix2d W_yk;
-        W_yk << 0, 0.5 * dt * dt,
-                0,        dt;
+        W_yk << 0.5 * dt * dt * std::sin(theta), 0.5 * dt * dt * std::cos(theta),
+                dt * std::sin(theta), -dt * std::cos(theta);
         
         Eigen::Matrix2d Q_y;
         Q_y << var_imu_x_, 0,
                 0       , var_imu_y_;
         
-        Xy_ = F_yk * Xy_ + W_yk.col(1) * A_linear_xy(1);
+        Xy_ = F_yk * Xy_ + W_yk * U_linear_xy;
         Py_ = F_yk * Py_ * F_yk.transpose() + W_yk * Q_y * W_yk.transpose();
         //----------------------------------------------------------------
         
