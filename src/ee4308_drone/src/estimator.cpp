@@ -312,7 +312,7 @@ namespace ee4308::drone
         Eigen::MatrixXd K;
         temp_term = (H_mag * Pa_ * (H_mag.transpose()) + V_mag * R_mag * (V_mag.transpose())).inverse();
         K = Pa_ * (H_mag.transpose()) * temp_term;
-        Xa_ = Xz_ + K * (Y_mag - H_mag * Xa_);
+        Xa_ = Xa_ + K * (Y_mag - H_mag * Xa_);
         Pa_ = Pa_ - K * H_mag * Pa_;
     }
 
