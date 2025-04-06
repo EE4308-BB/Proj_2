@@ -35,8 +35,8 @@ namespace ee4308::drone
                 0, 1;
 
         Eigen::Matrix2d W_xk;
-        W_xk << 0.5 * dt * dt * std::cos(theta), -0.5 * dt * dt * std::sin(theta),
-                dt * std::cos(theta), -dt * std::sin(theta);
+        W_xk << -0.5 * dt * dt * std::cos(theta), -0.5 * dt * dt * std::sin(theta),
+                -dt * std::cos(theta), -dt * std::sin(theta);
 
         Eigen::Matrix2d Q_x;
         Q_x << var_imu_x_, 0,
@@ -51,8 +51,8 @@ namespace ee4308::drone
                 0, 1;
 
         Eigen::Matrix2d W_yk;
-        W_yk << 0.5 * dt * dt * std::sin(theta), 0.5 * dt * dt * std::cos(theta),
-                dt * std::sin(theta), -dt * std::cos(theta);
+        W_yk << -0.5 * dt * dt * std::sin(theta), 0.5 * dt * dt * std::cos(theta),
+                -dt * std::sin(theta), -dt * std::cos(theta);
         
         Eigen::Matrix2d Q_y;
         Q_y << var_imu_x_, 0,
