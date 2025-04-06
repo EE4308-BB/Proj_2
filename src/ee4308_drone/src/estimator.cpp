@@ -24,8 +24,8 @@ namespace ee4308::drone
                             std::sin(theta),  std::cos(theta);
 
 
-        double u_xk = linear_acceleration.x;
-        double u_yk = linear_acceleration.y;
+        double u_xk = msg.linear_acceleration.x;
+        double u_yk = msg.linear_acceleration.y;
 
         double U_zk = msg.linear_acceleration.z - GRAVITY;
         double U_ak = msg.angular_velocity.z;
