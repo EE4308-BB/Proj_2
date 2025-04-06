@@ -5,7 +5,7 @@ namespace ee4308::drone
     Controller::Controller(const std::string &name = "controller_ee4308") : Node(name)
     {
         initParam(this, "frequency", frequency_, 10.0);
-        initParam(this, "use_ground_truth", use_ground_truth_, false);
+        initParam(this, "use_ground_truth", use_ground_truth_, false); 
         initParam(this, "enable", enable_, true);
         initParam(this, "lookahead_distance", lookahead_distance_, 1.0);
         initParam(this, "max_xy_vel", max_xy_vel_, 1.0);
@@ -41,12 +41,75 @@ namespace ee4308::drone
         if (!enable_)
             return;
 
+        //check if path exists
         if (plan_.poses.empty())
         {
             // RCLCPP_WARN_STREAM(this->get_logger(), "No path published");
             publishCmdVel(0, 0, 0, 0);
             return;
         }
+
+        // Get current pose
+        auto current_pose = odom_.pose.pose;
+        double px = current_pose.position.x;
+        double py = current_pose.position.y;
+        double pz = current_pose.position.z;
+
+
+          // ==== Step 1: Find the closest point on the path ====
+        size_t closest = 0; 
+        double min_dist = std::numeric_limits<double>::max(); //some big number
+        for (size_t i = 0; i < plan_.poses.size(); i++) {
+            auto& point = plan_.poses[i].pose.position; //point is just a placeholder
+            double dist = std::hypot(point.x - px, point.y - py);
+            if (dist < min_dist) {
+                min_dist = dist;
+                closest = i;
+            }
+        }
+
+         // ==== Step 2: Find the lookahead point ====
+        geometry_msgs::msg::PoseStamped lookahead_point = plan_.poses.back(); // default to last pose
+        for (size_t i = closest; i < plan_.poses.size(); ++i) {
+            auto& wp = plan_.poses[i].pose.position;
+            double dist = std::hypot(wp.x - px, wp.y - py);
+            if (dist >= lookahead_distance_) {
+                lookahead_point = plan_.poses[i];
+                break;
+
+            }
+        }
+
+
+
+        // ==== Step 3: Compute velocities to reach the lookahead point ====
+        double dx = lookahead_point.pose.position.x - px;
+        double dy = lookahead_point.pose.position.y - py;
+        double dz = lookahead_point.pose.position.z - pz;
+        
+        // Calculate the 2D distance
+        double distance_xy = std::hypot(dx, dy);
+
+        // Calculate the desired velocities in x, y, and z directions
+        double x_vel = kp_xy_ * dx / distance_xy;
+        double y_vel = kp_xy_ * dy / distance_xy;
+        double z_vel = kp_z_ * dz;
+
+        // Constrain the velocities to the maximum limits
+        x_vel = std::clamp(x_vel, -max_xy_vel_, max_xy_vel_);
+        y_vel = std::clamp(y_vel, -max_xy_vel_, max_xy_vel_);
+        z_vel = std::clamp(z_vel, -max_z_vel_, max_z_vel_);
+
+        // ==== Step 4: Apply the constant yaw velocity ====
+        double yaw_vel = yaw_vel_;  // Set constant yaw velocity
+
+        // ==== Step 5: Publish the velocities ====
+        publishCmdVel(x_vel, y_vel, z_vel, yaw_vel);
+    
+
+
+        
+        
 
         // ==== make use of ====
         // plan_.poses
@@ -65,7 +128,7 @@ namespace ee4308::drone
         // ==== ====
 
         // publish
-        publishCmdVel(0, 0, 0, 0);
+        //publishCmdVel(0, 0, 0, 0);
     }
 
     // ================================  PUBLISHING ========================================
