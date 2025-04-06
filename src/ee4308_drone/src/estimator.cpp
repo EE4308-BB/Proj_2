@@ -295,6 +295,7 @@ namespace ee4308::drone
         yaw = ee4308::limitAngle(yaw);
 
         Y_mag(0, 0) = yaw;
+        Ymagnet_ = yaw;
         
 
         if (!initialized_magnetic_) {
