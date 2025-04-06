@@ -18,6 +18,84 @@ namespace ee4308::drone
         //      Store the covariances in Px_, Py_, Pz_, and Pa_.
         //      Required for terminal printing during demonstration.
 
+        double theta = Xa_(0);
+        Eigen::Matrix2d transformation;
+        transformation << std::cos(theta), -std::sin(theta),
+                            std::sin(theta),  std::cos(theta);
+
+
+        double u_xk = linear_acceleration.x;
+        double u_yk = linear_acceleration.y;
+
+        double U_zk = msg.linear_acceleration.z - GRAVITY;
+        double U_ak = msg.angular_velocity.z;
+
+        Eigen::Vector2d U_linear_xy;
+        U_linear_xy << u_xk, u_yk;
+
+        Eigen::Vector2d A_linear_xy;
+        A_linear_xy = transformation * U_linear_xy;
+
+        Eigen::Matrix2d F_xk;
+        F_xk << 1, dt,
+                0, 1;
+
+        Eigen::Vector2d W_xk;
+        W_xk << 0.5 * dt * dt,
+                dt;
+
+        Eigen::Matrix2d Q_x;
+        Q_x << var_imu_x_, 0,
+                0       , var_imu_y_;
+
+        Xx_ = F_xk * Xx_ + W_xk * U_linear_xy;
+        Px_ = F_xk * Px_ * F_xk.transpose() + W_xk * Q_x * W_xk.transpose();
+        //----------------------------------------------------------------
+
+        Eigen::Matrix2d F_yk;
+        F_yk << 1, dt,
+                0, 1;
+
+        Eigen::Vector2d W_yk;
+        W_yk << 0.5 * dt * dt,
+                        dt;
+        
+        Eigen::Matrix2d Q_y;
+        Q_y << var_imu_x_, 0,
+                0       , var_imu_y_;
+        
+        Xy_ = F_yk * Xy_ + W_yk * U_linear_xy;
+        Py_ = F_yk * Py_ * F_yk.transpose() + W_yk * Q_y * W_yk.transpose();
+        //----------------------------------------------------------------
+        
+        double U_zk = msg.linear_acceleration.z - GRAVITY;
+        double Q_z = var_imu_z_;
+        
+        Eigen::Matrix2d F_zk;
+        F_zk << 1, dt,
+                0, 1;
+
+        Eigen::Vector2d W_zk;
+        W_zk << 0.5 * dt * dt,
+                dt;
+        
+        Xz_ = F_zk * Xz_ + W_zk * U_zk;
+        Pz_ = F_zk * Pz_ * F_zk.transpose() + W_zk * Q_z * W_zk.transpose();
+        //----------------------------------------------------------------
+
+        double Q_a = var_imu_a_;
+
+        Eigen::Matrix2d F_ak;
+        F_ak << 1, 0,
+                0, 0;
+
+        Eigen::Vector2d W_ak;
+        W_ak << dt,
+                1;
+        
+        Xa_ = F_ak * Xa_ + W_ak * U_ak; // Need to chehck U_ak
+        Pa_ = F_ak * Pa_ * F_ak.transpose() + W_ak * Q_a * W_ak.transpose();
+        
         // ==== make use of ====
         // msg.linear_acceleration
         // msg.angular_velocity
@@ -32,8 +110,8 @@ namespace ee4308::drone
 
         // ==== [FOR LAB 2 ONLY] ==== 
         // for proj 2, comment out / delete the following, so the pink covariance bubble does not fill up RViz for lab 2 ====
-        Px_ << 0.1, 0, 0, 0.1;
-        Py_ << 0.1, 0, 0, 0.1;
+        //Px_ << 0.1, 0, 0, 0.1;
+        //Py_ << 0.1, 0, 0, 0.1;
         // ==== ====
     }
 
@@ -47,14 +125,27 @@ namespace ee4308::drone
             return;
         }
 
-        // ==== make use of ====
-        // msg.range
-        // Ysonar_
-        // var_sonar_
-        // Xz_
-        // Pz_
-        // .transpose()
-        // ====  ====
+        Eigen::Vector2d H;
+        H << 1, 0;
+        Eigen::MatrixXd H_snr = H.transpose();
+
+        Eigen::Matrix<double, 1, 1> V_snr;
+        V_snr(0, 0) = 1.0;
+        Eigen::Matrix<double, 1, 1> R_snr;
+        R_snr(0, 0) = var_sonar_;
+        Eigen::Matrix<double, 1, 1> Y;
+        Y(0, 0) = msg.range;
+        Ysonar_ = msg.range;
+
+        Eigen::MatrixXd temp_term;
+        temp_term = (H_snr * Pz_ * (H_snr.transpose()) + V_snr * R_snr * (V_snr.transpose())).inverse();
+
+        Eigen::MatrixXd K;
+        K = Pz_ * (H_snr.transpose()) * temp_term;
+
+
+        Xz_ = Xz_ + K * (Y - H_snr * Xz_);
+        Pz_ = Pz_ - K * H_snr * Pz_;
     }
 
     // ================================ GPS sub callback / EKF Correction ========================================
@@ -70,6 +161,18 @@ namespace ee4308::drone
         // all the arguments above.
         // ====  ====
 
+        double e_sq = (RAD_EQUATOR * RAD_EQUATOR - RAD_POLAR * RAD_POLAR) /
+              (RAD_EQUATOR * RAD_EQUATOR);
+
+        double N = a / sqrt(1 - e_sq * sin_lat * sin_lat);
+
+        x = (N + alt) * cos_lat * cos_lon;
+        y = (N + alt) * cos_lat * sin_lon;
+        z = ((1 - e_sq) * N + alt) * sin_lat;
+
+
+        Eigen:Vector3d ECEF << x, y, z;
+
         return ECEF;
     }
 
@@ -83,10 +186,10 @@ namespace ee4308::drone
         double lon = -msg.longitude * DEG2RAD; // !!! Gazebo spherical coordinates have a bug. Need to negate.
         double alt = msg.altitude;
 
-        double sin_lat = sin(lat);
-        double cos_lat = cos(lat);
-        double sin_lon = sin(lon);
-        double cos_lon = cos(lon);
+        double sin_lat = sin(lat); // sin(phi)
+        double cos_lat = cos(lat); // cos(phi)
+        double sin_lon = sin(lon); // sin(delta)
+        double cos_lon = cos(lon); // cos(delta)
 
         if (initialized_ecef_ == false)
         {
@@ -96,6 +199,7 @@ namespace ee4308::drone
         }
 
         Eigen::Vector3d ECEF = getECEF(sin_lat, cos_lat, sin_lon, cos_lon, alt);
+
 
         // ==== make use of ====
         // Ygps_
@@ -110,6 +214,67 @@ namespace ee4308::drone
         // - Possible to divide a VectorXd element-wise by a double by using the divide operator '/'.
         // - Matrix multiplication using the times operator '*'.
         // ====  ====
+
+        Eigen::Matrix3d R_en;
+        R_en << -sin_lat * cos_lon, -sin_lon, -cos_lat * cos_lon,
+                -sin_lat * sin_lon, cos_lon, -cos_lat * sin_lon,
+                cos_lat,                0,              -sin_lat;                
+
+
+        Eigen::Vector3d xyz_n =  R_en.tranpose() * (ECEF - initial_ECEF_);
+
+
+        Eigen::Matrix3d R_mn;
+        R_mn << 0, 1, 0,
+                1, 0, 0,
+                0, 0, -1;
+
+        Ygps_ = R_mn * xyz_n + initial_position_;
+
+        Eigen::Matrix<double, 1, 1> V_gps;
+        V_gps(0, 0) = 1.0;
+
+        Eigen::Vector2d H;
+        H << 1, 0;
+        Eigen::MatrixXd H_gps = H.transpose();
+
+        Eigen::Matrix<double, 1, 1> R_gps_x;
+        Eigen::Matrix<double, 1, 1> R_gps_y;
+        Eigen::Matrix<double, 1, 1> R_gps_z;
+
+        R_gps_x(0, 0) = var_gps_x_;
+        R_gps_y(0, 0) = var_gps_y_;
+        R_gps_z(0, 0) = var_gps_z_;
+
+        Eigen::MatrixXd temp_term;
+        Eigen::MatrixXd K;
+
+        // X-axis
+        Eigen::Matrix<double, 1, 1> Y_x;
+        Y_x(0, 0) = Ygps_[0];
+        temp_term = (H_gps * Px_ * (H_gps.transpose()) + V_gps * R_gps * (V_gps.transpose())).inverse();
+        K = Px_ * (H_gps.transpose()) * temp_term;
+        Xx_ = Xx_ + K * (Y_x - H_gps * Xx_);
+        Px_ = Px_ - K * H_gps * Px_;
+
+
+        // Y-axis
+        Eigen::Matrix<double, 1, 1> Y_y;
+        Y_y(0, 0) = Ygps_[1];
+        temp_term = (H_gps * Py_ * (H_gps.transpose()) + V_gps * R_gps * (V_gps.transpose())).inverse();
+        K = Py_ * (H_gps.transpose()) * temp_term;
+        Xy_ = Xy_ + K * (Y_y - H_gps * Xy_);
+        Py_ = Py_ - K * H_gps * Py_;
+
+        // Z-axis
+        Eigen::Matrix<double, 1, 1> Y_z;
+        Y_z(0, 0) = Ygps_[2];
+        temp_term = (H_gps * Pz_ * (H_gps.transpose()) + V_gps * R_gps * (V_gps.transpose())).inverse();
+        K = Pz_ * (H_gps.transpose()) * temp_term;
+        Xz_ = Xz_ + K * (Y_z - H_gps * Xz_);
+        Pz_ = Pz_ - K * H_gps * Pz_;
+
+        // Need to check Q
     }
 
     // ================================ Magnetic sub callback / EKF Correction ========================================
@@ -121,17 +286,35 @@ namespace ee4308::drone
         
         // magnetic force direction in drone's z-axis can be ignored.
 
-        // ==== make use of ====
-        // Ymagnet_
-        // msg.vector.x // the magnetic force direction along drone's x-axis.
-        // msg.vector.y // the magnetic force direction along drone's y-axis.
-        // std::atan2()
-        // Xa_
-        // Pa_
-        // var_magnet_
-        // .transpose()
-        // limitAngle()
-        // ====  ====
+        Eigen::Vector2d H;
+        H << 1, 0;
+        Eigen::MatrixXd H_mag = H.transpose();
+
+        Eigen::Matrix<double, 1, 1> V_mag;
+        V_mag(0, 0) = 1.0;
+        Eigen::Matrix<double, 1, 1> R_mag;
+        R_mag(0, 0) = var_magnet_;
+        Eigen::Matrix<double, 1, 1> Y_mag;
+
+        double mx = msg->vector.x;
+        double my = msg->vector.y;
+
+        double yaw = -std::atan2(my, mx);
+        yaw = ee4308::limitAngle(yaw);
+
+        Y_mag(0, 0) = yaw;
+
+        if (!initialized_magnetic_) {
+            Xa_(0) = yaw;
+            initialized_magnetic_ = true;
+            return; // don't run the update on first measurement
+        }
+        
+
+        temp_term = (H_mag * Pa_ * (H_mag.transpose()) + V_mag * R_mag * (V_mag.transpose())).inverse();
+        K = Pa_ * (H_mag.transpose()) * temp_term;
+        Xa_ = Xz_ + K * (Y_mag - H_mag * Xa_);
+        Pa_ = Pa_ - K * H_mag * Pa_;
     }
 
     // ================================ Baro sub callback / EKF Correction ========================================
@@ -140,6 +323,28 @@ namespace ee4308::drone
         // if this section is done, Pz_ has to be augmented with the barometer bias to become a 3-state vector.
 
         (void)msg;
+        /*
+        Ybaro_ = msg.point.z;
+
+        Eigen::Vector3d H;
+        H << 1, 0, 1;
+        Eigen::MatrixXd H_bar = H.transpose();
+
+        Eigen::Matrix<double, 1, 1> V_bar;
+        V_bar(0, 0) = 1.0;
+
+        Eigen::Matrix<double, 1, 1> R_bar;
+        R_bar(0, 0) = var_baro_;
+
+        Eigen::Matrix<double, 1, 1> Y_bar;
+        Y_bar(0, 0) = Ybaro_;
+
+        temp_term = (H_bar * Pz_ * (H_bar.transpose()) + V_bar * R_bar * (V_bar.transpose())).inverse();
+        K = Pz_ * (H_bar.transpose()) * temp_term;
+
+        Xz_ = Xz_ + K * (Y_bar - H_bar * Xz_);
+        Pz_ = Pz_ - K * H_bar * Pz_;
+        */
 
         // ==== make use of ====
         // Ybaro_ 
