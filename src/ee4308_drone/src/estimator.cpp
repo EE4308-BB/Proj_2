@@ -170,7 +170,7 @@ namespace ee4308::drone
         double z = ((1 - e_sq) * N + alt) * sin_lat;
 
 
-        Eigen:Vector3d ECEF << x, y, z;
+        Eigen::Vector3d ECEF << x, y, z;
 
         return ECEF;
     }
@@ -310,6 +310,7 @@ namespace ee4308::drone
         }
         
         Eigen::MatrixXd temp_term;
+        Eigen::MatrixXd K;
         temp_term = (H_mag * Pa_ * (H_mag.transpose()) + V_mag * R_mag * (V_mag.transpose())).inverse();
         K = Pa_ * (H_mag.transpose()) * temp_term;
         Xa_ = Xz_ + K * (Y_mag - H_mag * Xa_);
