@@ -221,7 +221,7 @@ namespace ee4308::drone
                 cos_lat,                0,              -sin_lat;                
 
 
-        Eigen::Vector3d xyz_n =  R_en.tranpose() * (ECEF - initial_ECEF_);
+        Eigen::Vector3d xyz_n =  R_en.transpose() * (ECEF - initial_ECEF_);
 
 
         Eigen::Matrix3d R_mn;
@@ -252,7 +252,7 @@ namespace ee4308::drone
         // X-axis
         Eigen::Matrix<double, 1, 1> Y_x;
         Y_x(0, 0) = Ygps_[0];
-        temp_term = (H_gps * Px_ * (H_gps.transpose()) + V_gps * R_gps * (V_gps.transpose())).inverse();
+        temp_term = (H_gps * Px_ * (H_gps.transpose()) + V_gps * R_gps_x * (V_gps.transpose())).inverse();
         K = Px_ * (H_gps.transpose()) * temp_term;
         Xx_ = Xx_ + K * (Y_x - H_gps * Xx_);
         Px_ = Px_ - K * H_gps * Px_;
@@ -261,7 +261,7 @@ namespace ee4308::drone
         // Y-axis
         Eigen::Matrix<double, 1, 1> Y_y;
         Y_y(0, 0) = Ygps_[1];
-        temp_term = (H_gps * Py_ * (H_gps.transpose()) + V_gps * R_gps * (V_gps.transpose())).inverse();
+        temp_term = (H_gps * Py_ * (H_gps.transpose()) + V_gps * R_gps_y * (V_gps.transpose())).inverse();
         K = Py_ * (H_gps.transpose()) * temp_term;
         Xy_ = Xy_ + K * (Y_y - H_gps * Xy_);
         Py_ = Py_ - K * H_gps * Py_;
@@ -269,7 +269,7 @@ namespace ee4308::drone
         // Z-axis
         Eigen::Matrix<double, 1, 1> Y_z;
         Y_z(0, 0) = Ygps_[2];
-        temp_term = (H_gps * Pz_ * (H_gps.transpose()) + V_gps * R_gps * (V_gps.transpose())).inverse();
+        temp_term = (H_gps * Pz_ * (H_gps.transpose()) + V_gps * R_gps_z * (V_gps.transpose())).inverse();
         K = Pz_ * (H_gps.transpose()) * temp_term;
         Xz_ = Xz_ + K * (Y_z - H_gps * Xz_);
         Pz_ = Pz_ - K * H_gps * Pz_;
@@ -296,8 +296,8 @@ namespace ee4308::drone
         R_mag(0, 0) = var_magnet_;
         Eigen::Matrix<double, 1, 1> Y_mag;
 
-        double mx = msg->vector.x;
-        double my = msg->vector.y;
+        double mx = msg.vector.x;
+        double my = msg.vector.y;
 
         double yaw = -std::atan2(my, mx);
         yaw = ee4308::limitAngle(yaw);
@@ -310,7 +310,7 @@ namespace ee4308::drone
             return; // don't run the update on first measurement
         }
         
-
+        Eigen::MatrixXd temp_term;
         temp_term = (H_mag * Pa_ * (H_mag.transpose()) + V_mag * R_mag * (V_mag.transpose())).inverse();
         K = Pa_ * (H_mag.transpose()) * temp_term;
         Xa_ = Xz_ + K * (Y_mag - H_mag * Xa_);
