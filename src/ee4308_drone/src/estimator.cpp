@@ -68,7 +68,6 @@ namespace ee4308::drone
         Py_ = F_yk * Py_ * F_yk.transpose() + W_yk * Q_y * W_yk.transpose();
         //----------------------------------------------------------------
         
-        double U_zk = msg.linear_acceleration.z - GRAVITY;
         double Q_z = var_imu_z_;
         
         Eigen::Matrix2d F_zk;
@@ -164,11 +163,11 @@ namespace ee4308::drone
         double e_sq = (RAD_EQUATOR * RAD_EQUATOR - RAD_POLAR * RAD_POLAR) /
               (RAD_EQUATOR * RAD_EQUATOR);
 
-        double N = a / sqrt(1 - e_sq * sin_lat * sin_lat);
+        double N = RAD_EQUATOR / sqrt(1 - e_sq * sin_lat * sin_lat);
 
-        x = (N + alt) * cos_lat * cos_lon;
-        y = (N + alt) * cos_lat * sin_lon;
-        z = ((1 - e_sq) * N + alt) * sin_lat;
+        double x = (N + alt) * cos_lat * cos_lon;
+        double y = (N + alt) * cos_lat * sin_lon;
+        double z = ((1 - e_sq) * N + alt) * sin_lat;
 
 
         Eigen:Vector3d ECEF << x, y, z;
