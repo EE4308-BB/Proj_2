@@ -40,15 +40,15 @@ namespace ee4308::drone
         F_xk << 1, dt,
                 0, 1;
 
-        Eigen::Vector2d W_xk;
-        W_xk << 0.5 * dt * dt,
-                dt;
+        Eigen::Matrix2d W_xk;
+        W_xk << -0.5 * dt * dt * , 0
+                dt, 0;
 
         Eigen::Matrix2d Q_x;
         Q_x << var_imu_x_, 0,
                 0       , var_imu_y_;
 
-        Xx_ = F_xk * Xx_ + W_xk * A_linear_xy(0);
+        Xx_ = F_xk * Xx_ + W_xk.col(0) * A_linear_xy(0);
         Px_ = F_xk * Px_ * F_xk.transpose() + W_xk * Q_x * W_xk.transpose();
         //----------------------------------------------------------------
 
@@ -56,15 +56,15 @@ namespace ee4308::drone
         F_yk << 1, dt,
                 0, 1;
 
-        Eigen::Vector2d W_yk;
-        W_yk << 0.5 * dt * dt,
-                        dt;
+        Eigen::Matrix2d W_yk;
+        W_yk << 0, 0.5 * dt * dt,
+                0,        dt;
         
         Eigen::Matrix2d Q_y;
         Q_y << var_imu_x_, 0,
                 0       , var_imu_y_;
         
-        Xy_ = F_yk * Xy_ + W_yk * A_linear_xy(1);
+        Xy_ = F_yk * Xy_ + W_yk.col(1) * A_linear_xy(1);
         Py_ = F_yk * Py_ * F_yk.transpose() + W_yk * Q_y * W_yk.transpose();
         //----------------------------------------------------------------
         
@@ -301,6 +301,7 @@ namespace ee4308::drone
         yaw = ee4308::limitAngle(yaw);
 
         Y_mag(0, 0) = yaw;
+        
 
         if (!initialized_magnetic_) {
             Xa_(0) = yaw;
@@ -313,6 +314,7 @@ namespace ee4308::drone
         temp_term = (H_mag * Pa_ * (H_mag.transpose()) + V_mag * R_mag * (V_mag.transpose())).inverse();
         K = Pa_ * (H_mag.transpose()) * temp_term;
         Xa_ = Xa_ + K * (Y_mag - H_mag * Xa_);
+        Xa_(0) = ee4308::limitAngle(Xa_(0));
         Pa_ = Pa_ - K * H_mag * Pa_;
     }
 
