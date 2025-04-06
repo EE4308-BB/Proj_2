@@ -11,18 +11,50 @@ namespace ee4308::drone
         // waypoint_x_, waypoint_y_, waypoint_z_
         // reached_thres_
         // ==== ====
+        double drone_x_ = odom_.pose.pose.position.x;
+        double drone_y_ = odom_.pose.pose.position.y;
+        double drone_z_ = odom_.pose.pose.position.z;
 
-        if (1)  // change the 1: if (reached waypoint)
+        double del_x_ = abs(waypoint_x_ - drone_x_);
+        double del_y_ = abs(waypoint_y_ - drone_y_);
+        double del_z_ = abs(waypoint_z_ - drone_z_);
+
+        bool at_waypoint_ = sqrt(pow(del_x_, 2) + pow(del_y_, 2) + pow(del_z_, 2)) <= reached_thres_;
+
+        if (at_waypoint_)  // change the 1: if (reached waypoint)
         {
             if (state_ == TAKEOFF)
             {
                 transition(INITIAL);
             }
-            // ...
+
+            else if (state_ == INITIAL)
+            {
+                turtle_stop_ 
+                ? transition(LANDING)
+                : transition(TURTLE_POSITION);
+            }
+
+            else if (state_ == TURTLE_POSITION)
+            {
+                transition(TURTLE_WAYPOINT);
+            }
+
+            else if (state_ == TURTLE_WAYPOINT)
+            {
+                transition(INITIAL);
+            }
+
+            else if (state_ == LANDING)
+            {
+                transition(END);
+            }
+            
         }
 
         // request a plan with requestPlan(). This is done every time cbTimer() is called.
         // ...
+        requestPlan(drone_x_, drone_y_, drone_z_ ,waypoint_x_, waypoint_y_, waypoint_z_);
     }
 
     void Behavior::transition(int new_state)
@@ -39,6 +71,8 @@ namespace ee4308::drone
         // waypoint_x_, waypoint_y_, waypoint_z_
         // turtle_stop_
         // ==== ====
+        
+        state_ = new_state;
 
         if (state_ == TAKEOFF)
         {
@@ -51,6 +85,45 @@ namespace ee4308::drone
             pub_land_->publish(std_msgs::msg::Empty()); // turn off the drone.
             timer_ = nullptr;                           // delete the timer to shutdown.
         }
+
+        else if (state_ == INITIAL) 
+        {
+            if(!turtle_plan_.poses.empty() && !turtle_stop_) //I don't trust poses being empty after proj1
+            {
+                waypoint_x_ = initial_x_;       //where drone started
+                waypoint_y_ = initial_y_;
+                waypoint_z_ = cruise_height_;
+            }
+        }
+
+        else if (state_ == TURTLE_POSITION) 
+        {
+            if(!turtle_plan_.poses.empty() && !turtle_stop_) 
+            {
+                waypoint_x_ = turtle_plan_.poses.front().pose.position.x;       //where turtlebot is roughly at
+                waypoint_y_ = turtle_plan_.poses.front().pose.position.y;
+                waypoint_z_ = cruise_height_;
+
+            }
+        }
+
+        else if (state_ == TURTLE_WAYPOINT) 
+        {
+            if(!turtle_plan_.poses.empty() && !turtle_stop_) 
+            {
+                waypoint_x_ = turtle_plan_.poses.back().pose.position.x;       //where turtlebot ends up
+                waypoint_y_ = turtle_plan_.poses.back().pose.position.y;
+                waypoint_z_ = cruise_height_;
+            }
+        }
+
+        else if (state_ == LANDING) 
+        {
+            waypoint_x_ = initial_x_;       //where drone started
+            waypoint_y_ = initial_y_;
+            waypoint_z_ = initial_z_;
+        }
+
     }
 
     Behavior::Behavior(
