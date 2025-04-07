@@ -325,8 +325,14 @@ namespace ee4308::drone
         // if this section is done, Pz_ has to be augmented with the barometer bias to become a 3-state vector.
 
         (void)msg;
+
+        if (!initialized_baro_) {
+            baro_offset_ = msg.point.z;
+            initialized_baro_ = true;
+            return;
+        }        
         
-        Ybaro_ = msg.point.z;
+        Ybaro_ = msg.point.z - baro_offset_;
 
         Eigen::Vector3d H;
         H << 1, 0, 1;
@@ -416,6 +422,7 @@ namespace ee4308::drone
         last_predict_time_ = this->now().seconds();
         initialized_ecef_ = false;
         initialized_magnetic_ = false;
+        initialized_baro_ = false;
 
         timer_ = this->create_wall_timer(
             1s / frequency_,
