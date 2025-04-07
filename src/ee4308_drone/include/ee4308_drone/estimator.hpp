@@ -56,6 +56,7 @@ namespace ee4308::drone
         bool initialized_baro_;
         double baro_offset_;
         double initial_alt_;
+        double last_sonar_;
 
         // Parameters
         double frequency_;

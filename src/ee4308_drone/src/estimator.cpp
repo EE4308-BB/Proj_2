@@ -120,7 +120,11 @@ namespace ee4308::drone
             return;
         }
 
-        if (std::abs(msg.range - Xz_(2)) > 1.5) {
+        //if (std::abs(msg.range - Xz_(0)) > 0.4) {
+        //    return;
+        //}
+
+        if (std::abs(msg.range - last_sonar_) > 0.3 || std::abs(msg.range - Xz_(0)) > 0.2) {
             return;
         }
 
@@ -145,6 +149,7 @@ namespace ee4308::drone
 
         Xz_ = Xz_ + K * (Y - H_snr * Xz_);
         Pz_ = Pz_ - K * H_snr * Pz_;
+        last_sonar_ = msg.range;
     }
 
     // ================================ GPS sub callback / EKF Correction ========================================
