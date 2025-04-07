@@ -53,6 +53,8 @@ namespace ee4308::drone
         double last_predict_time_;
         bool initialized_ecef_;
         bool initialized_magnetic_;
+        bool initialized_baro_;
+        double baro_offset_;
 
         // Parameters
         double frequency_;
