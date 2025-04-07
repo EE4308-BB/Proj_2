@@ -55,6 +55,7 @@ namespace ee4308::drone
         bool initialized_magnetic_;
         bool initialized_baro_;
         double baro_offset_;
+        double initial_alt_;
 
         // Parameters
         double frequency_;
