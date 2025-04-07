@@ -120,6 +120,10 @@ namespace ee4308::drone
             return;
         }
 
+        if (std::abs(msg.range - Xz_(2)) > 1.5) {
+            return;
+        }
+
         Eigen::Vector3d H;
         H << 1, 0, 0;
         Eigen::MatrixXd H_snr = H.transpose();
@@ -163,7 +167,7 @@ namespace ee4308::drone
 
         double x = (N + alt) * cos_lat * cos_lon;
         double y = (N + alt) * cos_lat * sin_lon;
-        double z = ((1 - e_sq) * N + alt) * sin_lat;
+        double z = (RAD_POLAR * RAD_POLAR / (RAD_EQUATOR * RAD_EQUATOR) * N + alt) * sin_lat;
 
         ECEF << x, y, z;
 
@@ -189,10 +193,11 @@ namespace ee4308::drone
         {
             initial_ECEF_ = getECEF(sin_lat, cos_lat, sin_lon, cos_lon, alt);
             initialized_ecef_ = true;
+            initial_alt_ = alt;
             return;
         }
 
-        Eigen::Vector3d ECEF = getECEF(sin_lat, cos_lat, sin_lon, cos_lon, alt);
+        Eigen::Vector3d ECEF = getECEF(sin_lat, cos_lat, sin_lon, cos_lon, alt - initial_alt_);
 
 
         // ==== make use of ====
