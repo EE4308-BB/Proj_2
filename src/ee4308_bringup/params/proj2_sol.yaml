@@ -34,7 +34,7 @@ drone:
       var_gps_x: 1.0
       var_gps_y: 1.0
       var_gps_z: 1.0
-      var_baro: 3.0
+      var_baro: 2.0
       var_sonar: 1.0
       var_magnet: 0.1
       keep_old_sonar: 0.0
