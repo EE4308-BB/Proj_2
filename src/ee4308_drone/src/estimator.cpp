@@ -64,13 +64,15 @@ namespace ee4308::drone
         
         double Q_z = var_imu_z_;
         
-        Eigen::Matrix2d F_zk;
-        F_zk << 1, dt,
-                0, 1;
+        Eigen::Matrix3d F_zk;
+        F_zk << 1, dt, 0,
+                0, 1, 0,
+                0, 0, 1;
 
-        Eigen::Vector2d W_zk;
+        Eigen::Vector3d W_zk;
         W_zk << 0.5 * dt * dt,
-                dt;
+                dt,
+                0;
         
         Xz_ = F_zk * Xz_ + W_zk * U_zk;
         Pz_ = F_zk * Pz_ * F_zk.transpose() + W_zk * Q_z * W_zk.transpose();
@@ -118,8 +120,8 @@ namespace ee4308::drone
             return;
         }
 
-        Eigen::Vector2d H;
-        H << 1, 0;
+        Eigen::Vector3d H;
+        H << 1, 0, 0;
         Eigen::MatrixXd H_snr = H.transpose();
 
         Eigen::Matrix<double, 1, 1> V_snr;
@@ -259,12 +261,16 @@ namespace ee4308::drone
         Py_ = Py_ - K * H_gps * Py_;
 
         // Z-axis
+        Eigen::Vector3d H_z;
+        H_z << 1, 0, 0;
+        Eigen::MatrixXd H_gps_z = H_z.transpose();
+
         Eigen::Matrix<double, 1, 1> Y_z;
         Y_z(0, 0) = Ygps_[2];
-        temp_term = (H_gps * Pz_ * (H_gps.transpose()) + V_gps * R_gps_z * (V_gps.transpose())).inverse();
-        K = Pz_ * (H_gps.transpose()) * temp_term;
-        Xz_ = Xz_ + K * (Y_z - H_gps * Xz_);
-        Pz_ = Pz_ - K * H_gps * Pz_;
+        temp_term = (H_gps_z * Pz_ * (H_gps_z.transpose()) + V_gps * R_gps_z * (V_gps.transpose())).inverse();
+        K = Pz_ * (H_gps_z.transpose()) * temp_term;
+        Xz_ = Xz_ + K * (Y_z - H_gps_z * Xz_);
+        Pz_ = Pz_ - K * H_gps_z * Pz_;
 
         // Need to check Q
     }
@@ -319,7 +325,7 @@ namespace ee4308::drone
         // if this section is done, Pz_ has to be augmented with the barometer bias to become a 3-state vector.
 
         (void)msg;
-        /*
+        
         Ybaro_ = msg.point.z;
 
         Eigen::Vector3d H;
@@ -335,12 +341,14 @@ namespace ee4308::drone
         Eigen::Matrix<double, 1, 1> Y_bar;
         Y_bar(0, 0) = Ybaro_;
 
+        Eigen::MatrixXd temp_term;
+        Eigen::MatrixXd K;
         temp_term = (H_bar * Pz_ * (H_bar.transpose()) + V_bar * R_bar * (V_bar.transpose())).inverse();
         K = Pz_ * (H_bar.transpose()) * temp_term;
 
         Xz_ = Xz_ + K * (Y_bar - H_bar * Xz_);
         Pz_ = Pz_ - K * H_bar * Pz_;
-        */
+        
 
         // ==== make use of ====
         // Ybaro_ 
@@ -393,11 +401,11 @@ namespace ee4308::drone
         initial_position_ << initial_x, initial_y, initial_z;
         Xx_ << initial_x, 0;
         Xy_ << initial_y, 0;
-        Xz_ << initial_z, 0; // , 0 // change hpp as well.
+        Xz_ << initial_z, 0, 0; // , 0 // change hpp as well.
         Xa_ << 0, 0;
         Px_ = Eigen::Matrix2d::Constant(1e3),
         Py_ = Eigen::Matrix2d::Constant(1e3),
-        Pz_ = Eigen::Matrix2d::Constant(1e3); // Matrix3d; change hpp as well.
+        Pz_ = Eigen::Matrix3d::Constant(1e3); // Matrix3d; change hpp as well.
         Pa_ = Eigen::Matrix2d::Constant(1e3);
         initial_ECEF_ << NAN, NAN, NAN;
         Ygps_ << NAN, NAN, NAN;
@@ -477,18 +485,18 @@ namespace ee4308::drone
                       << std::setw(7) << std::setprecision(3) << Ygps_(2) << ","
                       << std::setw(8) << "---  )"
                       << std::endl;
-            // std::cout << "    Baro("
-            //           << std::setw(8) << "---  ,"
-            //           << std::setw(8) << "---  ,"
-            //           << std::setw(7) << std::setprecision(3) << Ybaro_ << ","
-            //           << std::setw(8) << "---  )"
-            //           << std::endl;
-            // std::cout << "   BBias("
-            //           << std::setw(8) << "---  ,"
-            //           << std::setw(8) << "---  ,"
-            //           << std::setw(7) << std::setprecision(3) << Xz_(2) << ","
-            //           << std::setw(8) << "---  )"
-            //           << std::endl;
+            std::cout << "    Baro("
+                       << std::setw(8) << "---  ,"
+                       << std::setw(8) << "---  ,"
+                       << std::setw(7) << std::setprecision(3) << Ybaro_ << ","
+                       << std::setw(8) << "---  )"
+                       << std::endl;
+            std::cout << "   BBias("
+                       << std::setw(8) << "---  ,"
+                       << std::setw(8) << "---  ,"
+                       << std::setw(7) << std::setprecision(3) << Xz_(2) << ","
+                       << std::setw(8) << "---  )"
+                       << std::endl;
             std::cout << "   Sonar("
                       << std::setw(8) << "---  ,"
                       << std::setw(8) << "---  ,"

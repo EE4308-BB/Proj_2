@@ -106,16 +106,16 @@ namespace ee4308::drone
         double y_vel_c = std::clamp(y_vel, -max_xy_vel_, max_xy_vel_);
         double z_vel_c = std::clamp(z_vel, -max_z_vel_, max_z_vel_);
 
+        if (distance_xy < 0.3) {
+            x_vel_c = 0.0;
+            y_vel_c = 0.0;
+        }
+
         // ==== Step 4: Apply the constant yaw velocity ====
         double yaw_vel = yaw_vel_;  // Set constant yaw velocity
 
         // ==== Step 5: Publish the velocities ====
         publishCmdVel(x_vel_c, y_vel_c, z_vel_c, yaw_vel);
-    
-
-
-        
-        
 
         // ==== make use of ====
         // plan_.poses
