@@ -27,14 +27,14 @@ drone:
   estimator:
     ros__parameters:
       frequency: 30.0
-      var_imu_x: 3.0
-      var_imu_y: 3.0
-      var_imu_z: 3.0
+      var_imu_x: 2.0
+      var_imu_y: 2.0
+      var_imu_z: 2.0
       var_imu_a: 0.2
       var_gps_x: 1.0
       var_gps_y: 1.0
       var_gps_z: 1.0
-      var_baro: 2.0
+      var_baro: 1.0
       var_sonar: 0.1
       var_magnet: 0.1
       use_sim_time: true

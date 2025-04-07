@@ -97,8 +97,8 @@ namespace ee4308::drone
         double distance_xy = std::hypot(dx, dy);
 
         // Calculate the desired velocities in x, y, and z directions
-        double x_vel = kp_xy_ * x_dash / distance_xy;
-        double y_vel = kp_xy_ * y_dash / distance_xy;
+        double x_vel = kp_xy_ * std::tanh(x_dash);
+        double y_vel = kp_xy_ * std::tanh(y_dash);
         double z_vel = kp_z_ * dz;
 
         // Constrain the velocities to the maximum limits
@@ -109,6 +109,10 @@ namespace ee4308::drone
         if (distance_xy < 0.3) {
             x_vel_c = 0.0;
             y_vel_c = 0.0;
+        }
+
+        if (std::abs(dz) < 0.1) {
+            z_vel = 0.0;
         }
 
         // ==== Step 4: Apply the constant yaw velocity ====
