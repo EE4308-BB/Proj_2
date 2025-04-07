@@ -88,7 +88,7 @@ namespace ee4308::drone
 
         else if (state_ == INITIAL) 
         {
-            if(!turtle_plan_.poses.empty() && !turtle_stop_) //I don't trust poses being empty after proj1
+            if(!turtle_plan_.poses.empty()) //I don't trust poses being empty after proj1
             {
                 waypoint_x_ = initial_x_;       //where drone started
                 waypoint_y_ = initial_y_;
@@ -98,7 +98,7 @@ namespace ee4308::drone
 
         else if (state_ == TURTLE_POSITION) 
         {
-            if(!turtle_plan_.poses.empty() && !turtle_stop_) 
+            if(!turtle_plan_.poses.empty()) 
             {
                 waypoint_x_ = turtle_plan_.poses.front().pose.position.x;       //where turtlebot is roughly at
                 waypoint_y_ = turtle_plan_.poses.front().pose.position.y;
@@ -109,7 +109,7 @@ namespace ee4308::drone
 
         else if (state_ == TURTLE_WAYPOINT) 
         {
-            if(!turtle_plan_.poses.empty() && !turtle_stop_) 
+            if(!turtle_plan_.poses.empty()) 
             {
                 waypoint_x_ = turtle_plan_.poses.back().pose.position.x;       //where turtlebot ends up
                 waypoint_y_ = turtle_plan_.poses.back().pose.position.y;
