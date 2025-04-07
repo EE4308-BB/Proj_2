@@ -8,7 +8,7 @@ namespace ee4308::drone
         initParam(this, "use_ground_truth", use_ground_truth_, false); 
         initParam(this, "enable", enable_, true);
         initParam(this, "lookahead_distance", lookahead_distance_, 1.0);
-        initParam(this, "max_xy_vel", max_xy_vel_, 1.0);
+        initParam(this, "max_xy_vel_", max_xy_vel_, 1.0);
         initParam(this, "max_z_vel", max_z_vel_, 0.5);
         initParam(this, "yaw_vel", yaw_vel_, -0.3);
         initParam(this, "kp_xy", kp_xy_, 1.0);
@@ -102,15 +102,15 @@ namespace ee4308::drone
         double z_vel = kp_z_ * dz;
 
         // Constrain the velocities to the maximum limits
-        x_vel = std::clamp(x_vel, -max_xy_vel_, max_xy_vel_);
-        y_vel = std::clamp(y_vel, -max_xy_vel_, max_xy_vel_);
-        z_vel = std::clamp(z_vel, -max_z_vel_, max_z_vel_);
+        double x_vel_c = std::clamp(x_vel, -max_xy_vel_, max_xy_vel_);
+        double y_vel_c = std::clamp(y_vel, -max_xy_vel_, max_xy_vel_);
+        double z_vel_c = std::clamp(z_vel, -max_z_vel_, max_z_vel_);
 
         // ==== Step 4: Apply the constant yaw velocity ====
         double yaw_vel = yaw_vel_;  // Set constant yaw velocity
 
         // ==== Step 5: Publish the velocities ====
-        publishCmdVel(x_vel, y_vel, z_vel, yaw_vel);
+        publishCmdVel(x_vel_c, y_vel_c, z_vel_c, yaw_vel);
     
 
 
